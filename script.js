@@ -6,7 +6,7 @@ const gameBoard = (() => {
     // State
     const board = [];
     // Given there's ever only 2 players, using boolean for state
-    let player1 = true;
+    let isPlayer1 = true;
     // fills the array with 9 empty strings
     const numberOfCells = 9;
     
@@ -16,8 +16,9 @@ const gameBoard = (() => {
         for (let i = 0; i < numberOfCells; i++) {
             board.push("");
         }
-        player1 = true;
+        isPlayer1 = true;
         renderBoard();
+        addClickEvent();
     }
 
     // Renders updated data to DOM
@@ -28,34 +29,31 @@ const gameBoard = (() => {
     }
 
     // event handler to select the cell
-    cells.forEach((e) => {
-        e.addEventListener("click", () => {
-            populateCell(e.id)
-        })
+    const addClickEvent = () => cells.forEach((e) => {
+        e.addEventListener("click", () => populateCell(e.id))
     })
-    
     // checks current player, populates cell with appropriate symbol
     const populateCell = (cellNumber) => {
         if (board[cellNumber] === "") {
-            board[cellNumber] = (player1 ? "O" : "X");
+            board[cellNumber] = (isPlayer1 ? player1.symbol : player2.symbol);
             renderBoard();
-            console.log(board);
-            player1 = !player1;
-            console.log(player1)
+            // console.log(board);
+            isPlayer1 = !isPlayer1;
+            // console.log(isPlayer1)
             checkWinner()
         }
     }
 
     return {
         initializeBoard,    
-        board
+        board,
+        populateCell,
     }
 })();
 
 
 // Initial Render
 gameBoard.initializeBoard();
-
 // Reset of Board
 document.getElementById("reset").addEventListener("click", gameBoard.initializeBoard)
 
@@ -82,11 +80,10 @@ const winCondition = [
     [2, 4, 6]
 ];
 
-
-// any of the win condition possibilities are the same symbol, end game and increase score by 1.
 function checkWinner() {
     let winningSymbol = ""
-
+    
+    // any of the win condition possibilities are the same symbol, end game and increase score by 1.
     let isThereAWinner = winCondition.find(condition => {
         let box = gameBoard.board;
         if (box[condition[0]] === box[condition[1]] && box[condition[0]] === box[condition[2]] && box[condition[0]] !== "") {
@@ -97,5 +94,10 @@ function checkWinner() {
 
     if (isThereAWinner) {       
         alert(`${winningSymbol} wins!`)
+        // Remove event handlers, add to counter.
+        // cells.forEach((e) => {
+        //     removeEventListener("click", () => gameBoard.populateCell(e.id))
+        // })
     }
 }
+
